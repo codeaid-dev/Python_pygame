@@ -1,8 +1,11 @@
 import pygame as pg, sys
 
+WIDTH, HEIGHT = 500, 500
+FPS = 60
 pg.init()
-screen = pg.display.set_mode((500,500))
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('画像拡大縮小')
+clock = pg.time.Clock()
 img = pg.image.load('images/drone_red.png')
 width,height = img.get_size()
 #img = pg.transform.scale(img,(width/2,height/2))
@@ -11,9 +14,9 @@ width,height = img.get_size()
 
 while True:
     screen.fill(pg.Color('white'))
-    screen.blit(img, ((500-width)/2,(500-height)/2))
+    screen.blit(img, ((WIDTH-width)/2,(HEIGHT-height)/2))
     pg.display.update()
-    pg.time.Clock().tick(60)
+    clock.tick(FPS)
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
