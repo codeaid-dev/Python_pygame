@@ -6,23 +6,45 @@ FPS = 60
 class Ball(pg.sprite.Sprite):
     def __init__(self, color, x, y, radius):
         super().__init__()
-        # 画像の作成 (透明な四角形の上に円を描く)
-        self.image = pg.Surface((radius * 2, radius * 2), pg.SRCALPHA)
-        pg.draw.circle(self.image, color, (radius, radius), radius)
-
         # 位置と移動速度の設定
-        self.rect = self.image.get_rect(center=(x, y))
         self.speed = [random.randint(-5, 5), random.randint(-5, 5)]
+
+        self.radius = radius # 半径設定
+        self.x, self.y = x, y # 座標設定
+        self.color = color # 色設定
+        self.growth = 1 # 大きさ変化量
+
+        self.update_size()
+
+    def update_size(self):
+        # 現在の半径に合わせて新しいSurfaceを作成
+        size = self.radius * 2
+        # 画像の作成 (透明な四角形の上に円を描く)
+        self.image = pg.Surface((size, size), pg.SRCALPHA)
+        pg.draw.circle(self.image, self.color,
+                       (self.radius, self.radius), self.radius)
+        # rect更新
+        self.rect = self.image.get_rect(center=(self.x, self.y))
 
     def update(self):
         # 移動処理
         self.rect.move_ip(self.speed)
+
+        # 中央値更新
+        self.x, self.y = self.rect.center
 
         # 画面端での跳ね返り判定
         if self.rect.left < 0 or self.rect.right > WIDTH:
             self.speed[0] *= -1
         if self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.speed[1] *= -1
+
+        # 大きさの変化
+        self.radius += self.growth
+        if self.radius > 50 or self.radius < 10:
+            self.growth *= -1
+
+        self.update_size()
 
 # メイン処理
 pg.init()
@@ -53,7 +75,7 @@ while running:
     screen.fill(pg.Color('white'))
     # 全てのBallがscreenに描画される
     all_balls.draw(screen)
-
+    
     pg.display.update()
     clock.tick(FPS)
 

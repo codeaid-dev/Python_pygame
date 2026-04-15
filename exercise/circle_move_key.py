@@ -1,35 +1,57 @@
-import pygame as pg, sys
+import pygame as pg
+
+WIDTH, HEIGHT = 500, 500
+FPS = 60
+class Circle(pg.sprite.Sprite):
+    def __init__(self,radius):
+        super().__init__()
+        self.image = pg.Surface((radius * 2, radius * 2), pg.SRCALPHA)
+        pg.draw.circle(self.image, (0,0,0), (radius, radius), radius)
+        self.x, self.y = WIDTH/2, HEIGHT/2
+        self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.radius = radius
+        self.speed = 5
+
+    def update(self):
+        key = pg.key.get_pressed()
+        if key[pg.K_UP]:
+            self.y -= self.speed
+        if key[pg.K_DOWN]:
+            self.y += self.speed
+        if key[pg.K_RIGHT]:
+            self.x += self.speed
+        if key[pg.K_LEFT]:
+            self.x -= self.speed
+        if self.x > WIDTH-self.radius:
+            self.x = WIDTH-self.radius
+        if self.x < self.radius:
+            self.x = self.radius
+        if self.y > HEIGHT-self.radius:
+            self.y = HEIGHT-self.radius
+        if self.y < self.radius:
+            self.y = self.radius
+
+        self.rect.center = (self.x, self.y)
 
 pg.init()
-screen = pg.display.set_mode((500,500))
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('円をキーで動かす')
-x,y = 250,250
-speed = 5
+clock = pg.time.Clock()
 
-while True:
-    screen.fill(pg.Color('white'))
-    key = pg.key.get_pressed()
-    if key[pg.K_UP]:
-        y -= speed
-    if key[pg.K_DOWN]:
-        y += speed
-    if key[pg.K_RIGHT]:
-        x += speed
-    if key[pg.K_LEFT]:
-        x -= speed
+all_circles = pg.sprite.Group()
+all_circles.add(Circle(25))
 
-    if x > 475:
-        x -= speed
-    if x < 25:
-        x += speed
-    if y > 475:
-        y -= speed
-    if y < 25:
-        y += speed
-    pg.draw.circle(screen, pg.Color('black'), (x,y), 25)
-    pg.display.update()
-    pg.time.Clock().tick(60)
+running = True
+while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
+            running = False
+
+    all_circles.update()
+    screen.fill(pg.Color('white'))
+    all_circles.draw(screen)
+
+    pg.display.update()
+    clock.tick(FPS)
+
+pg.quit()
