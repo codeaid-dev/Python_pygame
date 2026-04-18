@@ -32,7 +32,7 @@ class Drone(pg.sprite.Sprite):
                 self.rect.left = 0
             if self.rect.right > WIDTH:
                 self.rect.right = WIDTH
-    
+
         if self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.speed[1] *= -1
             if self.rect.top < 0:
