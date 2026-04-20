@@ -1,4 +1,4 @@
-import pygame as pg, sys
+import pygame as pg, sys, math
 
 pg.init()
 screen = pg.display.set_mode((800,600))
@@ -16,6 +16,7 @@ while True:
     pg.draw.line(screen, pg.Color('blue'), (250,100), (300,250), 5) #線,2点の座標
     pg.draw.circle(screen, pg.Color('green'), (400,175), 75) #円,座標：中心,半径
     pg.draw.circle(screen, pg.Color('green'), (560,175), 75, 5) #width引数を指定すると塗りつぶしなし枠線あり
+    pg.draw.arc(screen, pg.Color('green'), (645,100,150,150), math.radians(90), math.radians(270), 5) # 円弧,座標：左上隅,横,縦
     pg.draw.ellipse(screen, (255,0,255), (100,270,50,150)) #楕円,座標：左上隅,横,縦
     pg.draw.ellipse(screen, (255,0,255), (160,270,50,150), 5) #width引数を指定すると塗りつぶしなし枠線あり
     pg.draw.polygon(screen, (0,255,255), [[245,270],[220,420],[270,420]]) #多角形,各点の座標リスト
