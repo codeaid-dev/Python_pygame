@@ -59,4 +59,3 @@ while running:
     clock.tick(FPS)
 
 pg.quit()
-
