@@ -3,13 +3,13 @@ import pygame as pg
 WIDTH, HEIGHT = 400, 400
 FPS = 60
 class Circle(pg.sprite.Sprite):
-    def __init__(self, x, y, color, radius, is_player=False):
+    def __init__(self, x, y, color, radius):
         super().__init__()
         self.image = pg.Surface((radius * 2, radius * 2), pg.SRCALPHA)
         self.rect = self.image.get_rect(center=(x, y))
         self.color = color
         self.radius = radius
-        self.is_player = is_player
+        self.mx, self.my = 0,0
         self.draw()
 
     def draw(self):
@@ -19,15 +19,13 @@ class Circle(pg.sprite.Sprite):
                        self.radius)
 
     def update(self):
-        if self.is_player:
-            mx,my = pg.mouse.get_pos()
-            self.rect.center = (mx, my)
+        self.mx,self.my = pg.mouse.get_pos()
 
-    def collision(self, other):
-        dx = self.rect.centerx - other.rect.centerx
-        dy = self.rect.centery - other.rect.centery
+    def collision(self):
+        dx = self.rect.centerx - self.mx
+        dy = self.rect.centery - self.my
         distance = (dx**2 + dy**2)**0.5
-        return distance <= (self.radius + other.radius)
+        return distance <= (self.radius)
 
 pg.init()
 screen = pg.display.set_mode((WIDTH,HEIGHT))
@@ -35,9 +33,8 @@ pg.display.set_caption('円と円(点)の当たり判定')
 clock = pg.time.Clock()
 
 all_sprites = pg.sprite.Group()
-player = Circle(30,30,(100,150,250),30,True)
 enemy = Circle(WIDTH/2,HEIGHT/2,(255,0,0),50)
-all_sprites.add(player, enemy)
+all_sprites.add(enemy)
 
 running = True
 while running:
@@ -47,10 +44,8 @@ while running:
 
     all_sprites.update()
     for sprite in all_sprites:
-        if sprite is player:
-            continue
-        if sprite.collision(player):
-            sprite.color = (255,0,0,150)
+        if sprite.collision():
+            sprite.color = (0,0,255)
         else:
             sprite.color = (255,0,0)
         sprite.draw()
