@@ -1,31 +1,64 @@
-import pygame as pg, sys
+import pygame as pg
+
+WIDTH, HEIGHT = 400, 400
+FPS = 60
+class Rect(pg.sprite.Sprite):
+    def __init__(self, x, y, color, rw, rh, is_player=False):
+        super().__init__()
+        self.image = pg.Surface((rw, rh), pg.SRCALPHA)
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.x,self.y = x,y
+        self.rw,self.rh = rw,rh
+        self.color = color
+        self.is_player = is_player
+        self.draw()
+
+    def draw(self):
+        self.image.fill((0, 0, 0, 0))
+        pg.draw.rect(self.image, self.color,
+                     pg.Rect(0,0,self.rw,self.rh))
+
+    def update(self):
+        if self.is_player:
+            mx,my = pg.mouse.get_pos()
+            self.rect.center = (mx, my)
+
+    def collision(self,other):
+        return other.rect.left <= self.rect.right \
+            and self.rect.left <= other.rect.right \
+            and other.rect.top <= self.rect.bottom \
+            and self.rect.top <= other.rect.bottom
 
 pg.init()
-screen = pg.display.set_mode((400,400))
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('矩形(四角形)と矩形(四角形)の当たり判定')
+clock = pg.time.Clock()
 
-def collision(target,you):
-    return you.left <= target.right \
-        and target.left <= you.right \
-        and you.top <= target.bottom \
-        and target.top <= you.bottom
+all_sprites = pg.sprite.Group()
+player = Rect(30,30,(100,150,250),100,100,True)
+enemy = Rect(WIDTH/2-50,HEIGHT/2-50,(255,0,0),100,100,False)
+all_sprites.add(player, enemy)
 
-while True:
-    screen.fill(pg.Color('white'))
-    mx,my = pg.mouse.get_pos()
-    you = pg.Rect(mx,my,120,120)
-    rx = screen.get_width()/2-50
-    ry = screen.get_height()/2-50
-    target = pg.Rect(rx,ry,100,100)
-    if collision(target,you):
-    #if target.colliderect(you):
-        color = pg.Color(255,0,0)
-    else:
-        color = pg.Color(0,0,0)
-    pg.draw.rect(screen,pg.Color(100,150,250),you)
-    pg.draw.rect(screen,color,target)
-    pg.display.update()
+running = True
+while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
+            running = False
+
+    all_sprites.update()
+    for sprite in all_sprites:
+        if sprite is player:
+            continue
+        if sprite.collision(player):
+        # if sprite.rect.colliderect(player):
+            sprite.color = (255,0,0,150)
+        else:
+            sprite.color = (255,0,0)
+        sprite.draw()
+
+    screen.fill(pg.Color('white'))
+    all_sprites.draw(screen)
+    pg.display.update()
+    clock.tick(FPS)
+
+pg.quit()
