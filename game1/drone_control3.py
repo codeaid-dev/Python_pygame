@@ -1,106 +1,150 @@
-import pygame as pg, sys, random
+import pygame as pg, random
 
-class Character:
-    pass
+WIDTH, HEIGHT = 500, 500
+FPS = 60
+class Drone(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        img = pg.image.load('images/drone_red.png')
+        width,height = img.get_size()
+        self.image = pg.transform.scale(img, (width/3,height/3))
+        self.rect = self.image.get_rect(center=(x, y))
+        self.speed = 5
+
+    def update(self):
+        x,y,w,h = self.rect
+        key = pg.key.get_pressed()
+        if key[pg.K_UP]:
+            y -= self.speed
+        if key[pg.K_DOWN]:
+            y += self.speed
+        if key[pg.K_RIGHT]:
+            x += self.speed
+        if key[pg.K_LEFT]:
+            x -= self.speed
+
+        if x < -w:
+            x = WIDTH
+        if x > WIDTH:
+            x = -w
+        if y < -h:
+            y = HEIGHT
+        if y > HEIGHT:
+            y = -h
+        self.rect.topleft = (x,y)
+
+class Bit(pg.sprite.Sprite):
+    def __init__(self, x, y, color, rw, rh):
+        super().__init__()
+        self.image = pg.Surface((rw, rh), pg.SRCALPHA)
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.color = color
+        self.dx = random.randint(-4,4)
+        self.dy = random.randint(-4,4)
+        self.alive = True
+        self.draw()
+
+    def draw(self):
+        self.image.fill((0, 0, 0, 0))
+        pg.draw.rect(self.image, self.color,
+                     pg.Rect(0,0,self.rect.w,self.rect.h))
+
+    def update(self):
+        if not self.alive:
+            self.kill()
+            return
+        self.rect.x += self.dx
+        self.rect.y += self.dy
+        if self.rect.left <= 0 or self.rect.right >= WIDTH:
+            self.dx *= -1
+        if self.rect.top <= 0 or self.rect.bottom >= HEIGHT:
+            self.dy *= -1
+
+class Ufo(pg.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        img = pg.image.load('images/ufo.png')
+        width,height = img.get_size()
+        self.image = pg.transform.scale(img, (width/8,height/8))
+        width,height = self.image.get_size()
+        x = random.randint(0,WIDTH-width)
+        y = random.randint(0,HEIGHT-height)
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.speed = [random.randint(-4, 4), random.randint(-4, 4)]
+        self.alive = True
+
+    def update(self):
+        if not self.alive:
+            self.kill()
+            return
+        self.rect.move_ip(self.speed)
+        if self.rect.left < 0 or self.rect.right > WIDTH:
+            self.speed[0] *= -1
+        if self.rect.top < 0 or self.rect.bottom > HEIGHT:
+            self.speed[1] *= -1
 
 pg.init()
-screen = pg.display.set_mode((500,500))
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('ドローンを操作する')
-drone = pg.image.load('images/drone_red.png')
-ufo = pg.image.load('images/ufo.png')
-width,height = drone.get_size()
-drone = pg.transform.scale(drone,(width/3,height/3))
-width,height = drone.get_size()
-x,y = (500-width)/2,(500-height)/2
-speed = 5
-targets = []
-for i in range(100):
-    target = Character()
-    target.rect = pg.Rect(random.randint(0,490),random.randint(0,490),10,10)
-    target.flag = False
-    target.dx = random.randint(1,4)
-    target.dy = random.randint(1,4)
-    targets.append(target)
+clock = pg.time.Clock()
 
-ufo_w,ufo_h = ufo.get_size()
-ufo = pg.transform.scale(ufo,(ufo_w/8,ufo_h/8))
-ufo_w,ufo_h = ufo.get_size()
-ufos = []
-for i in range(5):
-    u = Character()
-    u.rect = pg.Rect(random.randint(0,500-ufo_w),random.randint(0,500-ufo_h),ufo_w,ufo_h)
-    u.flag = False
-    u.dx = random.randint(1,4)
-    u.dy = random.randint(1,4)
-    ufos.append(u)
+all_sprites = pg.sprite.Group()
+drone = Drone(WIDTH/2,HEIGHT/2)
+all_sprites.add(drone)
+bits = pg.sprite.Group()
+for _ in range(100):
+    bit = Bit(random.randint(0,490),
+              random.randint(0,490),
+              (255,0,0),10,10)
+    bits.add(bit)
+    all_sprites.add(bit)
+ufos = pg.sprite.Group()
+for _ in range(5):
+    ufo = Ufo()
+    ufos.add(ufo)
+    all_sprites.add(ufo)
 
 clear,over = False,False
-
-while True:
-    screen.fill(pg.Color('white'))
-    key = pg.key.get_pressed()
-    if key[pg.K_UP]:
-        y -= speed
-    if key[pg.K_DOWN]:
-        y += speed
-    if key[pg.K_RIGHT]:
-        x += speed
-    if key[pg.K_LEFT]:
-        x -= speed
-
-    if x < -width:
-        x = 500
-    if x > 500:
-        x = -width
-    if y < -height:
-        y = 500
-    if y > 500:
-        y = -height
-
-    pr = screen.blit(drone, (x,y))
-
-    for t in targets:
-        if t.rect.colliderect(pr):
-            t.flag = True
-            continue
-        if not t.flag:
-            t.rect.x += t.dx
-            t.rect.y += t.dy
-            if t.rect.x < 0 or t.rect.x > 490:
-                t.dx *= -1
-            if t.rect.y < 0 or t.rect.y > 490:
-                t.dy *= -1
-            pg.draw.rect(screen, pg.Color('red'), t.rect)
-
-    for u in ufos:
-        if u.rect.colliderect(pr):
-            u.flag = True
-        if not u.flag:
-            u.rect.x += u.dx
-            u.rect.y += u.dy
-            if u.rect.x < 0 or u.rect.x > 500-u.rect.w:
-                u.dx *= -1
-            if u.rect.y < 0 or u.rect.y > 500-u.rect.h:
-                u.dy *= -1
-        screen.blit(ufo, u.rect)
-
-    flags = [u.flag for u in ufos]
-    if all(flags) and not clear:
-        font = pg.font.SysFont('Helvetica',30)
-        text = font.render('GAME OVER',True,(0,0,0))
-        screen.blit(text,((500-text.get_width())/2,(500-text.get_height())/2))
-        over = True
-
-    flags = [t.flag for t in targets]
-    if all(flags) and not over:
-        font = pg.font.SysFont('Helvetica',30)
-        text = font.render('GAME CLEAR',True,(0,0,0))
-        screen.blit(text,((500-text.get_width())/2,(500-text.get_height())/2))
-        clear = True
-
-    pg.display.update()
-    pg.time.Clock().tick(60)
+running = True
+while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
+            running = False
+
+    all_sprites.update()
+    for bit in bits.sprites():
+        if bit.rect.colliderect(drone):
+            bit.alive = False
+
+    for ufo in ufos.sprites():
+        if ufo.rect.colliderect(drone):
+            ufo.alive = False
+
+    screen.fill(pg.Color('white'))
+    all_sprites.draw(screen)
+    if len(ufos.sprites())==0 and not clear:
+        over = True
+
+    if len(bits.sprites())==0 and not over:
+        clear = True
+
+    if over:
+        font = pg.font.SysFont('Helvetica',30)
+        text = font.render('GAME OVER',
+                           True,(0,0,0))
+        screen.blit(text,
+                   ((WIDTH-text.get_width())/2,
+                   (HEIGHT-text.get_height())/2))
+
+    if clear:
+        font = pg.font.SysFont('Helvetica',30)
+        text = font.render('GAME CLEAR',
+                           True,(0,0,0))
+        screen.blit(text,
+                   ((WIDTH-text.get_width())/2,
+                   (HEIGHT-text.get_height())/2))
+
+    pg.display.update()
+    clock.tick(FPS)
+
+pg.quit()
