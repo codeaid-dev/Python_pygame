@@ -1,9 +1,11 @@
-import pygame as pg, sys, random
+import pygame as pg, random
 
-WINDOW_SIZE = WIDTH,HEIGHT = 600,600
+WIDTH,HEIGHT = 600,600
+FPS = 3
 pg.init()
-screen = pg.display.set_mode(WINDOW_SIZE)
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('スネークゲーム')
+clock = pg.time.Clock()
 
 class Snake:
     def __init__(self):
@@ -51,7 +53,22 @@ snake = Snake()
 food = Food()
 food.set_position()
 
-while True:
+running = True
+while running:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_UP:
+                snake.direction(0,-1)
+            if event.key == pg.K_DOWN:
+                snake.direction(0,1)
+            if event.key == pg.K_RIGHT:
+                snake.direction(1,0)
+            if event.key == pg.K_LEFT:
+                snake.direction(-1,0)
+
     screen.fill(pg.Color('black'))
     if over:
         txt = font.render('GAME OVER',True,(255,0,0))
@@ -68,17 +85,5 @@ while True:
         food.set_position()
 
     pg.display.update()
-    pg.time.Clock().tick(3)
-    for event in pg.event.get():
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP:
-                snake.direction(0,-1)
-            if event.key == pg.K_DOWN:
-                snake.direction(0,1)
-            if event.key == pg.K_RIGHT:
-                snake.direction(1,0)
-            if event.key == pg.K_LEFT:
-                snake.direction(-1,0)
-        if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
+    clock.tick(FPS)
+pg.quit()
