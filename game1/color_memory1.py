@@ -1,9 +1,11 @@
-import pygame as pg, sys, random
+import pygame as pg, random
 
-WINDOW_SIZE = WIDTH,HEIGHT = 600,400
+WIDTH,HEIGHT = 600,400
+FPS = 60
 pg.init()
-screen = pg.display.set_mode(WINDOW_SIZE)
+screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('色記憶')
+clock = pg.time.Clock()
 
 class Tile:
     def __init__(self,x,y,c):
@@ -32,7 +34,12 @@ for i in range(6):
                       colors[i]))
 font = pg.font.SysFont('helvetica', 30)
 
-while True:
+running = True
+while running:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+
     screen.fill(pg.Color('white'))
     for t in tiles:
         t.draw()
@@ -40,7 +47,5 @@ while True:
     screen.blit(txt,((WIDTH-txt.get_width())/2,50))
 
     pg.display.update()
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            pg.quit()
-            sys.exit()
+    clock.tick(FPS)
+pg.quit()
