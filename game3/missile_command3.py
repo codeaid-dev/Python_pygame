@@ -1,6 +1,7 @@
 import pygame as pg, sys, math, random, time
 
 WIDTH,HEIGHT = 800,600
+FPS = 60
 pg.init()
 screen = pg.display.set_mode((WIDTH,HEIGHT))
 pg.display.set_caption('ミサイルコマンド')
@@ -159,4 +160,4 @@ while True:
         if event.type == pg.QUIT:
             pg.quit()
             sys.exit()
-    clock.tick(60)
+    clock.tick(FPS)
