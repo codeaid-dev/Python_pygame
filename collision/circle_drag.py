@@ -34,8 +34,8 @@ for _ in range(5):
     color = (random.randint(0,255),
              random.randint(0,255),
              random.randint(0,255))
-    enemy = Circle(x,y,color,25)
-    all_sprites.add(enemy)
+    target = Circle(x,y,color,25)
+    all_sprites.add(target)
 
 dragging = None
 offset_x = 0

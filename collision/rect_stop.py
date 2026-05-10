@@ -45,8 +45,8 @@ all_sprites = pg.sprite.Group()
 player = Rect(30,30,(100,150,250),60,60,True)
 all_sprites.add(player)
 for _ in range(7):
-    enemy = Rect(WIDTH/2,HEIGHT/2,(255,0,0),40,40)
-    all_sprites.add(enemy)
+    target = Rect(WIDTH/2,HEIGHT/2,(255,0,0),40,40)
+    all_sprites.add(target)
 
 running = True
 while running:

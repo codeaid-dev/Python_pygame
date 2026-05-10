@@ -47,8 +47,8 @@ for i in range(6):
     x = random.randint(25,WIDTH-25)
     y = random.randint(25,HEIGHT-25)
     color = random.choice([(255,0,0),(0,255,0),(0,0,255)])
-    enemy = Circle(x,y,color,25)
-    all_sprites.add(enemy)
+    target = Circle(x,y,color,25)
+    all_sprites.add(target)
 
 running = True
 while running:

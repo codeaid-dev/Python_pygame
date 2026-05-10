@@ -48,8 +48,8 @@ clock = pg.time.Clock()
 
 all_sprites = pg.sprite.Group()
 player = Circle(30,30,(100,150,250),30,True)
-enemy = Circle(WIDTH/2,HEIGHT/2,(255,0,0),20)
-all_sprites.add(player, enemy)
+target = Circle(WIDTH/2,HEIGHT/2,(255,0,0),20)
+all_sprites.add(player, target)
 
 running = True
 while running:

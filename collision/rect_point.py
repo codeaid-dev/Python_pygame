@@ -36,8 +36,8 @@ pg.display.set_caption('マウスと矩形(四角形)の当たり判定')
 clock = pg.time.Clock()
 
 all_sprites = pg.sprite.Group()
-enemy = Rect(WIDTH/2-50,HEIGHT/2-50,(0,0,0),100,100)
-all_sprites.add(enemy)
+target = Rect(WIDTH/2-50,HEIGHT/2-50,(0,0,0),100,100)
+all_sprites.add(target)
 
 running = True
 while running:
